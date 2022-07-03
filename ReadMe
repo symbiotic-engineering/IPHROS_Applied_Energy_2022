@@ -1,8 +1,13 @@
 The files here in this repository are supplemental material for the Applied Energy paper submission:
 
 Haefner_IPHROS_MOGA.m - MATLAB file that runs the optimization of the IPHRO system using a multiobjective genetic algorithm
+
 Haefner_Aw_Eqn_Analysis.jmp - JMP project that includes the analysis used in developing Equation 41 for the membrane water permeability coefficient
+
 Haefner_R_Eqn_Analysis_JMP.jmp - JMP project that includes the analysis used to determine that the fractional salt rejection rate is a function of the permeate flowrate
+
 Haefner_R_Eqn_Formulation.m - MATLAB file that compares different models for fitting an equation for the fractional salt rejection rate and generates Equation 37
+
 Haefner_WAVE_Simulations.xlsx - data from WAVE simulations
+
 Haefner_WAVE_Simulations_trimmed.xlsx - a reduced version of HAEFNER_WAVE_simulations.xlsx that does not include any WAVE simulations that generate an "RO Design Warning" or have a permeate flowrate of zero due to rounding in WAVE 
