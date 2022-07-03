@@ -1,4 +1,4 @@
-The files here in this repository are supplemental material for the Applied Energy paper submission:
+The files here in this repository are supplemental material for the paper submitted to Applied Energy entitled "Integrated Pumped Hydro Reverse Osmosis System Optimization Featuring Surrogate Model Development in Reverse Osmosis Modeling":
 
 Haefner_IPHROS_MOGA.m - MATLAB file that runs the optimization of the IPHRO system using a multiobjective genetic algorithm
 
