@@ -152,15 +152,15 @@ end
 
 function [V_fwRO,V_oRO,S_oRO,rho_oRO,eta_ROio,eta_RO,rr_max,rr_min,Q_f_max,Q_f_min,Q_c_max,Q_c_min,Q_p_max,Q_p_min,LHS_SVM] = ro_system(h,Q_f_input,N_e1,N_e2,N_pv1,N_pv2,rho_sw,rho_fw,T,S_sw,M_salt,P_p,R,MW_salt_avg,Am)
 
-    % Initialize oopsies relative to Q_f_input
+    % Initialize violation variables relative to Q_f_input
     if Q_f_input <= 98272 && Q_f_input >= 21620 % gpd
-        oopsies = 0;
-        oopsies1 = 0;
-        oopsies2 = 0;
+        violation = 0;
+        violation_s1 = 0;
+        violation_s2 = 0;
     else
-        oopsies = 1;
-        oopsies1 = 1;
-        oopsies2 = 1;
+        violation = 1;
+        violation_s1 = 1;
+        violation_s2 = 1;
     end
 
     % Collection Lists
@@ -177,7 +177,7 @@ function [V_fwRO,V_oRO,S_oRO,rho_oRO,eta_ROio,eta_RO,rr_max,rr_min,Q_f_max,Q_f_m
     i1 = 1;
     
     % First stage
-    while i1 <= N_e1 && oopsies ~= 1
+    while i1 <= N_e1 && violation ~= 1
         % Beginning with feed conditions into an element
         if i1 == 1
             % First element
@@ -199,11 +199,11 @@ function [V_fwRO,V_oRO,S_oRO,rho_oRO,eta_ROio,eta_RO,rr_max,rr_min,Q_f_max,Q_f_m
         Q_f_collection = [Q_f_collection;Q_f];
 
         % Solving for Q_p and other numeric values %%%%%%%%%%%%%%%%%%%%%%%
-        [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,oopsies1] = symbolic_Q_p_stuff(c_f,T,Q_f,Am,P_f,P_p);
+        [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,violation_s1] = symbolic_Q_p_stuff(c_f,T,Q_f,Am,P_f,P_p);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if oopsies1 == 1
+        if violation_s1 == 1
             i1 = N_e1 + 1;
-            oopsies2 = 1;
+            violation_s2 = 1;
         else
             % Storing element outputs for further calculations
             Q_p_collection = [Q_p_collection;Q_p_num]; % gpd
@@ -229,7 +229,7 @@ function [V_fwRO,V_oRO,S_oRO,rho_oRO,eta_ROio,eta_RO,rr_max,rr_min,Q_f_max,Q_f_m
     Q_f_collection2 = []; % gpd
 
     % Second stage
-    if N_e2 == 0 || N_pv2 == 0 || oopsies == 1 || oopsies1 == 1
+    if N_e2 == 0 || N_pv2 == 0 || violation == 1 || violation_s1 == 1
         i2 = N_e2+1;
     else        
         % initialize second stage element counter
@@ -259,9 +259,9 @@ function [V_fwRO,V_oRO,S_oRO,rho_oRO,eta_ROio,eta_RO,rr_max,rr_min,Q_f_max,Q_f_m
         Q_f_collection = [Q_f_collection;Q_f];
         
         % Solving for Q_p and other numeric values %%%%%%%%%%%%%%%%%%%%%%%
-        [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,oopsies2] = symbolic_Q_p_stuff(c_f,T,Q_f,Am,P_f,P_p);
+        [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,violation_s2] = symbolic_Q_p_stuff(c_f,T,Q_f,Am,P_f,P_p);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if oopsies2 == 1
+        if violation_s2 == 1
             i2 = N_e2 + 1;
         else
             % Storing element outputs for further calculations
@@ -275,7 +275,7 @@ function [V_fwRO,V_oRO,S_oRO,rho_oRO,eta_ROio,eta_RO,rr_max,rr_min,Q_f_max,Q_f_m
             i2 = i2 + 1;
         end
     end
-    if oopsies == 1 || oopsies1 == 1 || oopsies2 == 1
+    if violation == 1 || violation_s1 == 1 || violation_s2 == 1
         % Dependent vars
         V_fwRO = 0; V_oRO = 0; S_oRO = 1e5; rho_oRO = 1e5; eta_ROio = 0; eta_RO = 0;
 
@@ -440,7 +440,7 @@ function rho_brine = density_from_salinity(S,P,rho_fw,T,P_p)
 end
 
 % RO helper function (handles symbolic Q_p stuff)
-function [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,oopsies] = symbolic_Q_p_stuff(c_f,T,Q_f,Am,P_f,P_p)
+function [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,violation] = symbolic_Q_p_stuff(c_f,T,Q_f,Am,P_f,P_p)
     % Set up symbolic Q_p
     syms Q_p real
         
@@ -470,14 +470,14 @@ function [Q_p_num,P_c_num,c_c_num,Q_c_num,rr_num,oopsies] = symbolic_Q_p_stuff(c
     Q_p_num = double(vpasolve(eqn,Q_p,[60 8370])); % gpd
 
     if isempty(Q_p_num) == 1
-        oopsies = 1;
+        violation = 1;
         Q_p_num = 0;
         P_c_num = 0;
         c_c_num = 0;
         Q_c_num = 0;
         rr_num = 0;
     else
-        oopsies = 0;
+        violation = 0;
         % Subbing in Q_p to element outputs
         P_c_num = P_f-double(subs(dP_fc,Q_p,Q_p_num)); % psi
         c_c_num = double(subs(c_c,Q_p,Q_p_num));       % mol/L
