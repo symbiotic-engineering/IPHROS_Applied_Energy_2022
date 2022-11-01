@@ -11,3 +11,7 @@ Haefner_R_Eqn_Formulation.m - MATLAB file that compares different models for fit
 Haefner_WAVE_Simulations.xlsx - data from WAVE simulations
 
 Haefner_WAVE_Simulations_trimmed.xlsx - a reduced version of HAEFNER_WAVE_simulations.xlsx that does not include any WAVE simulations that generate an "RO Design Warning" or have a permeate flowrate of zero due to rounding in WAVE 
+
+Opt Results.xlsx - Excel file with optimization results. This file is used in analyzing_converged_results_V2.m. This is a temporary file. Once made official, it will be renamed Haefner_...
+
+analyzing_converged_results_v2.m - MATLAB file used to generate figures for processing optimization results. This file uses Opt Results.xlsx. This is a temporary file. Once made official, it will be renamed Haefner_...
