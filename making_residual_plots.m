@@ -31,7 +31,7 @@ ylabel('Studentized Residuals','FontSize',14)
 % ylabel('$Studentized \; Residuals$','Interpreter','latex','FontSize',14)
 legend('Data','y=0')
 
-% Actual vs predicted
+% Actual vs predicted %
 % figure(2)
 % scatter(predicted_Aw,actual_Aw)
 % hold on
